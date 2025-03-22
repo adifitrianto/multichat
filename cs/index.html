@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CS Widget</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <div id="system-messages"></div>
+
+    <div id="chat-container">
+        <!-- Client List Sidebar -->
+        <div id="client-list">
+            <!-- Dynamically generated client list goes here -->
+        </div>
+
+        <!-- Chat Window -->
+        <div id="chat-window">
+            <div id="chat-header">Select a client</div>
+            <div id="chat-box"></div>
+            <div id="input-area">
+                <input type="text" id="chat-input" placeholder="Type a message..." />
+                <button id="send-btn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="widget.js"></script>
+</body>
+
+</html>

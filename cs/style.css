@@ -1,0 +1,112 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+/* System Messages */
+#system-messages {
+    padding: 10px;
+    background-color: #e0e0e0;
+    border-bottom: 1px solid #ccc;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Chat Container */
+#chat-container {
+    display: flex;
+    height: 500px;
+}
+
+/* Sidebar */
+#client-list {
+    width: 30%;
+    background-color: #ffffff;
+    border-right: 1px solid #ccc;
+    overflow-y: auto;
+}
+
+.client-item {
+    padding: 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.client-item.active {
+    background-color: #e0f7fa;
+}
+
+/* Chat Window */
+#chat-window {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #e5ddd5;
+}
+
+#chat-header {
+    padding: 15px;
+    background-color: #075e54;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+#chat-box {
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.message {
+    max-width: 70%;
+    padding: 8px 12px;
+    border-radius: 16px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+.client {
+    background-color: #ffffff;
+    align-self: flex-start;
+    color: #000000;
+}
+
+.agent {
+    background-color: #dcf8c6;
+    align-self: flex-end;
+    color: #000000;
+}
+
+/* Input Area */
+#input-area {
+    display: flex;
+    padding: 10px;
+    background-color: #ffffff;
+    border-top: 1px solid #ccc;
+}
+
+input[type="text"] {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+}
+
+button {
+    padding: 10px;
+    background-color: #128c7e;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+button:hover {
+    background-color: #0e7769;
+}

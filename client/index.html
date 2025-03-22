@@ -9,13 +9,13 @@
 </head>
 
 <body>
+    <div id="chat-box" class="chat-box"></div>
+    <input id="chat-input" type="text" placeholder="Type a message..." />
+    <button id="send-btn">Send</button>
+    <button id="agent-btn">Talk to Agent</button>
+    <button id="bot-btn">Talk to Bot</button>
 
     <script src="widget.js"></script>
-    <script>
-        // Initialize the chat widget
-        const chat = new ChatWidget('ws://localhost:8080'); // Update with your backend URL
-    </script>
-
 </body>
 
 </html>
