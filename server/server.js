@@ -1,3 +1,4 @@
+const { default: axios } = require('axios');
 const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({ port: 7070 });
@@ -24,16 +25,11 @@ wss.on('connection', (ws) => {
         break;
 
       case 'CLIENT_TO_BOT':
-        // console.log(`Message to bot from ${parsedMessage.clientId}: ${parsedMessage.content}`);
-        // // Simulate bot response (replace with Rasa integration)
-        // setTimeout(() => {
-        //   if (clients[parsedMessage.clientId]) {
-        //     clients[parsedMessage.clientId].send(JSON.stringify({
-        //       type: 'BOT_MESSAGE',
-        //       content: `Bot reply: ${parsedMessage.content}`
-        //     }));
-        //   }
-        // }, 500);
+        const message = parsedMessage.content
+        agents[parsedMessage.agentId] = ws;
+
+        sendMessage(ws, message, parsedMessage.clientId)
+
         break;
 
       case 'CLIENT_TO_AGENT':
@@ -127,6 +123,47 @@ function findAvailableAgent() {
   // Return the first available agent (if any)
   const agentIds = Object.keys(agents);
   return agentIds.length > 0 ? agents[agentIds[0]] : null;
+}
+
+async function sendMessage(ws, message, clientId) {
+  if (message) {
+    // handleIncomingMessage({ text: message, sender: 'client' });
+
+    const response = await fetch('http://192.168.1.12:5005/webhooks/rest/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sender: 'user',
+        message: message
+      })
+    });
+
+    const data = await response.json();
+
+    const reply = data[0].text
+
+    console.log(data)
+
+    responseFromBot(ws, reply, clientId)
+
+    // data.forEach(msg => handleIncomingMessage({ text: msg.text, sender: 'bot' }));
+    // if (!isTalkingToAgent) {
+    // } else {
+    //   console.log("Agent mode is enabled — no message sent to Rasa");
+    // }
+    //
+    // chatInput.value = '';
+  }
+}
+
+function responseFromBot(ws, message, clientId) {
+  if (message) {
+    ws.send(JSON.stringify({
+      type: 'BOT_MESSAGE',
+      clientId: clientId,
+      content: message,
+    }));
+  }
 }
 
 console.log('WebSocket server running on ws://localhost:7070');
