@@ -13,7 +13,7 @@ let conversations = {}; // Store messages for each client
 socket.addEventListener('open', () => {
   console.log('Connected to server as agent');
   socket.send(JSON.stringify({
-    type: 'CONNECT_AGENT',
+    type: 'INIT_AGENT',
     agentId
   }));
 });
@@ -22,10 +22,13 @@ socket.addEventListener('message', (event) => {
   const message = JSON.parse(event.data);
   console.log(message)
 
-  if (message.type === 'CLIENT_REQUEST_AGENT') {
-    handleNewClient(message.clientId);
-  } else if (message.type === 'CLIENT_MESSAGE') {
-    handleIncomingMessage(message.clientId, message.content);
+  switch (message.type) {
+    case 'CLIENT_REQUEST_AGENT':
+      handleNewClient(message.clientId);
+      break;
+    case 'CLIENT_MESSAGE':
+      handleIncomingMessage(message.clientId, message.content);
+      break;
   }
 });
 
@@ -69,17 +72,62 @@ function addClientToList(clientId) {
 
 // Switch to specific client
 function switchToClient(clientId) {
-  currentClient = clientId;
   chatHeader.textContent = `Chat with Client ${clientId}`;
 
   // Remove active state from all items
   document.querySelectorAll('.client-item').forEach(item => {
     item.classList.remove('active');
   });
+  
+  currentClient = clientId
 
-  // Add active state to current client
-  const activeItem = [...clientList.children].find(item => item.dataset.clientId === clientId);
-  if (activeItem) activeItem.classList.add('active');
+  for(children of clientList.children) {
+    const childrenClientId = children.getAttribute('data-client-id');
+    if (currentClient === childrenClientId) {
+      children.classList.add('active');
+
+      const message = "Hello! How can I help you today?"
+
+      conversations[currentClient].push({
+        text: message,
+        sender: 'agent',
+      });
+
+      renderMessages(currentClient);
+      chatInput.value = '';
+
+      socket.send(JSON.stringify({
+        type: 'CONNECT_AGENT',
+        clientId: childrenClientId,
+        agentId,
+        isFocused: true,
+        content: message,
+      }));
+
+      continue
+    }
+    
+    children.classList.remove('active');
+
+    socket.send(JSON.stringify({
+      type: 'CONNECT_AGENT',
+      clientId: childrenClientId,
+      agentId,
+      isFocused: false,
+      content: `Agent is currently chat with other user ${currentClient}`,
+    }));       
+  }
+  // // Add active state to current client
+  // const activeItem = [...clientList.children].find(item => item.dataset.clientId === clientId);
+  // if (activeItem) {
+  //   activeItem.classList.add('active'); 
+
+  //   if (currentClient = clientId) {
+      
+  //   }
+  // }
+
+  currentClient = clientId;
 
   renderMessages(clientId);
 }

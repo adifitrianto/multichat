@@ -25,9 +25,19 @@
       case 'SYSTEM_MESSAGE':
         displayMessage(data.content, 'system');
         break;
+      case 'SYSTEM_MESSAGE_NO_AGENTS':
+        displayMessage(data.content, 'system');
+        chatMode = 'agent'
+        break;
       case 'AGENT_ASSIGNED':
         chatMode = 'agent';
-        displayMessage('You are now connected to a human agent.', 'system');
+        const isFocused = data.isFocused ?? false
+        if (isFocused) {
+          displayMessage('You are now connected to a human agent.', 'system');
+        }
+        if (data.content) { 
+          displayMessage(data.content, 'agent');
+        }
         toggleButtons(true); // Show "Switch to Bot" button
         break;
       case 'SESSION_ENDED':
@@ -47,6 +57,7 @@
   });
 
   function sendMessage(message) {
+    console.log(chatMode)
     if (chatMode === 'bot') {
       socket.send(JSON.stringify({
         type: 'CLIENT_TO_BOT',
@@ -103,6 +114,16 @@
     if (input.value.trim()) {
       sendMessage(input.value.trim());
       input.value = '';
+    }
+  });
+
+  document.getElementById('chat-input').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      const input = document.getElementById('chat-input');
+      if (input.value.trim()) {
+        sendMessage(input.value.trim());
+        input.value = '';
+      }
     }
   });
 
