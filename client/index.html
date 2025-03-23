@@ -1,21 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat Widget Test</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hostinger-like Chat Widget</title>
+  <!-- Link to external CSS -->
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-    <div id="chat-box" class="chat-box"></div>
-    <input id="chat-input" type="text" placeholder="Type a message..." />
-    <button id="send-btn">Send</button>
-    <button id="agent-btn">Talk to Agent</button>
-    <button id="bot-btn">Talk to Bot</button>
 
-    <script src="widget.js"></script>
+  <!-- 1) Floating Chat Button -->
+  <div id="chatbot-button">💬</div>
+
+  <!-- 2) The Chat Widget (hidden by default) -->
+  <div id="chat-widget">
+    <div class="chat-container">
+      <!-- Chat Header -->
+      <div class="chat-header">
+        Chat Support
+        <button class="close-btn" id="close-btn">&times;</button>
+      </div>
+
+      <!-- Chat Messages Area -->
+      <div id="chat-box" class="chat-box"></div>
+
+      <!-- Input Row (Message + Send) -->
+      <div class="chat-input-area">
+        <input id="chat-input" class="chat-input" type="text" placeholder="Type a message..." />
+        <button id="send-btn" class="send-btn">Send</button>
+      </div>
+
+      <!-- Action Buttons (Agent / Bot) -->
+      <div class="action-buttons">
+        <button id="agent-btn" class="switch-btn">Talk to Agent</button>
+        <button id="bot-btn" class="switch-btn">Talk to Bot</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3) Link to external JavaScript -->
+  <script src="widget.js"></script>
 </body>
-
 </html>

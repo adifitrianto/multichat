@@ -1,112 +1,165 @@
-/* General Styling */
+/* 1. Reset margins and paddings, let html/body occupy full height */
+html,
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Roboto", sans-serif;
 }
 
-/* System Messages */
-#system-messages {
-    padding: 10px;
-    background-color: #e0e0e0;
-    border-bottom: 1px solid #ccc;
-    font-size: 14px;
-    color: #666;
-}
-
-/* Chat Container */
+/* 2. Main container takes up full viewport using flex layout */
 #chat-container {
-    display: flex;
-    height: 500px;
+  display: flex;
+  width: 100%;
+  height: 100vh; /* full browser window height */
+  background: #f0f0f0;
 }
 
-/* Sidebar */
+/* 3. Sidebar (client list) styling */
 #client-list {
-    width: 30%;
-    background-color: #ffffff;
-    border-right: 1px solid #ccc;
-    overflow-y: auto;
+  width: 30%;
+  max-width: 400px;
+  background: #f1f1f1;
+  border-right: 1px solid #ddd;
+  overflow-y: auto; /* scroll if client list is long */
 }
 
+/* Sidebar header */
+#chat-header-sidebar {
+  background-color: #007bff;
+  color: #fff;
+  padding: 12px 16px;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Client item in the sidebar */
 .client-item {
-    padding: 15px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
+  padding: 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.3s;
+}
+
+.client-item:hover {
+  background-color: #e6e6e6;
 }
 
 .client-item.active {
-    background-color: #e0f7fa;
+  background-color: #ddd;
+  color: #222;
 }
 
-/* Chat Window */
+/* 4. Chat window: use column flex to stack chat-box + input-area */
 #chat-window {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    background-color: #e5ddd5;
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* fill the remaining space (besides sidebar) */
+  background: #fff;
 }
 
+/* Chat window header */
 #chat-header {
-    padding: 15px;
-    background-color: #075e54;
-    color: #ffffff;
-    font-weight: bold;
+  background-color: #007bff;
+  color: #fff;
+  padding: 12px 16px;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
 }
 
+/* The scrollable chat area */
 #chat-box {
-    flex-grow: 1;
-    padding: 10px;
-    overflow-y: auto;
+  flex-grow: 1; /* expand to fill space */
+  padding: 12px;
+  overflow-y: auto; /* scroll if content exceeds height */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: #f5f5f5;
 }
 
-.message {
-    max-width: 70%;
-    padding: 8px 12px;
-    border-radius: 16px;
-    margin-bottom: 8px;
-    font-size: 14px;
-    word-wrap: break-word;
-}
-
-.client {
-    background-color: #ffffff;
-    align-self: flex-start;
-    color: #000000;
-}
-
-.agent {
-    background-color: #dcf8c6;
-    align-self: flex-end;
-    color: #000000;
-}
-
-/* Input Area */
+/* 5. Input area pinned at bottom */
 #input-area {
-    display: flex;
-    padding: 10px;
-    background-color: #ffffff;
-    border-top: 1px solid #ccc;
+  display: flex;
+  flex-shrink: 0; /* do not shrink when resizing */
+  padding: 12px;
+  background: #f9f9f9;
+  border-top: 1px solid #ddd;
 }
 
-input[type="text"] {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    outline: none;
+/* Input styling */
+#chat-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+  transition: border 0.3s;
 }
 
-button {
-    padding: 10px;
-    background-color: #128c7e;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    margin-left: 5px;
+#chat-input:focus {
+  border-color: #007bff;
 }
 
-button:hover {
-    background-color: #0e7769;
+/* Send button styling */
+#send-btn {
+  margin-left: 10px;
+  padding: 10px 20px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#send-btn:hover {
+  background: #0056b3;
+}
+
+/* Chat message styling */
+.message {
+  padding: 10px;
+  border-radius: 18px;
+  word-wrap: break-word;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Client messages on the left */
+.message-client {
+  background-color: #dcf8c6;
+  color: #000;
+  text-align: left;
+  align-self: flex-start; /* ensures they appear on the left side */
+}
+
+/* Agent messages on the right */
+.message-agent {
+  background-color: #cce5ff;
+  color: #000;
+  text-align: right;
+  align-self: flex-end; /* ensures they appear on the right side */
+}
+
+/* Timestamp styling */
+.message-time {
+  background: none;
+  border: none;
+  margin: 0 5px 10px 5px;
+  display: block;
+  font-size: 0.75rem;
+  color: #888;
+  clear: both;
+}
+
+/* Different alignment for agent vs. client time, if needed */
+.time-agent {
+  text-align: right;
+}
+
+.time-client {
+  text-align: left;
 }

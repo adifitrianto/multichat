@@ -1,35 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CS Widget</title>
+    <!-- Link to your CSS file -->
     <link rel="stylesheet" href="style.css" />
-</head>
+  </head>
 
-<body>
-
+  <body>
+    <!-- System messages, if any -->
     <div id="system-messages"></div>
 
+    <!-- Main chat container (sidebar + chat window) -->
     <div id="chat-container">
-        <!-- Client List Sidebar -->
-        <div id="client-list">
-            <!-- Dynamically generated client list goes here -->
-        </div>
+      <!-- Sidebar (client list) -->
+      <div id="client-list">
+        <div id="chat-header-sidebar">Chat Room</div>
+        <!-- Client items will be appended here dynamically -->
+      </div>
 
-        <!-- Chat Window -->
-        <div id="chat-window">
-            <div id="chat-header">Select a client</div>
-            <div id="chat-box"></div>
-            <div id="input-area">
-                <input type="text" id="chat-input" placeholder="Type a message..." />
-                <button id="send-btn">Send</button>
-            </div>
+      <!-- Chat Window -->
+      <div id="chat-window">
+        <!-- A separate header for the chat window (top) -->
+        <div id="chat-header">Select a client on the chat room</div>
+
+        <!-- The scrollable chat box where messages appear -->
+        <div id="chat-box"></div>
+
+        <!-- The input area at the bottom -->
+        <div id="input-area">
+          <input type="text" id="chat-input" placeholder="Type a message..." />
+          <button id="send-btn">Send</button>
         </div>
+      </div>
     </div>
 
+    <!-- Your JavaScript file -->
     <script src="widget.js"></script>
-</body>
-
+  </body>
 </html>

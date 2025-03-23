@@ -1,6 +1,6 @@
-const { default: axios } = require('axios');
-const { parse } = require('uuid');
-const WebSocket = require('ws');
+const { default: axios } = require("axios");
+const { parse } = require("uuid");
+const WebSocket = require("ws");
 
 const wss = new WebSocket.Server({ port: 7070 });
 
@@ -9,135 +9,173 @@ const agents = {};
 let initAgents = {};
 const agentFocusedClient = {};
 
-wss.on('connection', (ws) => {
-  console.log('Client connected');
+wss.on("connection", (ws) => {
+  console.log("Client connected");
 
-  ws.on('message', (message) => {
+  ws.on("message", (message) => {
     const parsedMessage = JSON.parse(message);
-    console.log('Received:', parsedMessage);
+    console.log("Received:", parsedMessage);
 
     switch (parsedMessage.type) {
-      case 'CONNECT_CLIENT':
+      case "CONNECT_CLIENT":
         clients[parsedMessage.clientId] = ws;
         console.log(`Client connected: ${parsedMessage.clientId}`);
-        sendMessage(ws, 'Halo', parsedMessage.clientId)
+        sendMessage(ws, "Halo", parsedMessage.clientId);
         break;
 
-      case 'INIT_AGENT':
-        initAgents = {}
+      case "INIT_AGENT":
+        initAgents = {};
         initAgents[parsedMessage.agentId] = ws;
         console.log(`Agent connected: ${parsedMessage.agentId}`);
 
-        for (const clientId in  clients) {
-          console.log(clientId)
-          clients[clientId].send(JSON.stringify({
-            type: 'SYSTEM_MESSAGE',
-            content: 'Agent disconnected'
-          }));
+        for (const clientId in clients) {
+          console.log(clientId);
+          clients[clientId].send(
+            JSON.stringify({
+              type: "SYSTEM_MESSAGE",
+              content: "Agent disconnected",
+              time: Math.floor(Date.now() / 1000),
+            })
+          );
         }
         break;
 
-      case 'CONNECT_AGENT':
+      case "CONNECT_AGENT":
         agents[parsedMessage.clientId] = ws;
 
-        isFocused = parsedMessage.isFocused ?? false
+        isFocused = parsedMessage.isFocused ?? false;
         if (isFocused) {
-          agentFocusedClient[parsedMessage.agentId] = parsedMessage.clientId
+          agentFocusedClient[parsedMessage.agentId] = parsedMessage.clientId;
         }
 
-        clients[parsedMessage.clientId].send(JSON.stringify({
-          type: 'AGENT_ASSIGNED',
-          isFocused,
-          content: parsedMessage.content
-        }));
+        if (clients[parsedMessage.clientId]) {
+          clients[parsedMessage.clientId].send(
+            JSON.stringify({
+              type: "AGENT_ASSIGNED",
+              isFocused,
+              lastClient: parsedMessage.lastClient,
+              role: parsedMessage.role,
+              time: Math.floor(Date.now() / 1000),
+              content: parsedMessage.content,
+            })
+          );
+        }
 
         console.log(`Agent connected and assigned: ${parsedMessage.clientId}`);
         break;
 
-      case 'CLIENT_TO_BOT':
-        const message = parsedMessage.content
+      case "CLIENT_TO_BOT":
+        const message = parsedMessage.content;
         // agents[parsedMessage.agentId] = ws;
 
-        sendMessage(ws, message, parsedMessage.clientId)
+        sendMessage(ws, message, parsedMessage.clientId);
 
         break;
 
-      case 'CLIENT_TO_AGENT':
+      case "CLIENT_TO_AGENT":
         if (agents[parsedMessage.clientId]) {
-          agents[parsedMessage.clientId].send(JSON.stringify({
-            type: 'CLIENT_MESSAGE',
-            clientId: parsedMessage.clientId,
-            content: parsedMessage.content
-          }));
+          agents[parsedMessage.clientId].send(
+            JSON.stringify({
+              type: "CLIENT_MESSAGE",
+              clientId: parsedMessage.clientId,
+              content: parsedMessage.content,
+              time: Math.floor(Date.now() / 1000),
+            })
+          );
         } else {
-          // If agent is not available, notify client
-          clients[parsedMessage.clientId].send(JSON.stringify({
-            type: 'SYSTEM_MESSAGE',
-            content: 'No agent available.'
-          }));
+          // If agent is not available, notify client.
+          clients[parsedMessage.clientId].send(
+            JSON.stringify({
+              type: "SYSTEM_MESSAGE",
+              content: "No agent available.",
+              time: Math.floor(Date.now() / 1000),
+            })
+          );
         }
         break;
 
-      case 'AGENT_TO_CLIENT':
+      case "AGENT_TO_CLIENT":
         if (clients[parsedMessage.clientId]) {
-          clients[parsedMessage.clientId].send(JSON.stringify({
-            type: 'AGENT_MESSAGE',
-            content: parsedMessage.content
-          }));
+          clients[parsedMessage.clientId].send(
+            JSON.stringify({
+              type: "AGENT_MESSAGE",
+              content: parsedMessage.content,
+              time: Math.floor(Date.now() / 1000),
+            })
+          );
         }
         break;
 
-      case 'REQUEST_AGENT':
+      case "REQUEST_AGENT":
         const agent = findAvailableAgent();
         if (agent) {
           agents[parsedMessage.clientId] = agent;
 
-          agent.send(JSON.stringify({
-            type: 'CLIENT_REQUEST_AGENT',
-            clientId: parsedMessage.clientId
-          }));
+          agent.send(
+            JSON.stringify({
+              type: "CLIENT_REQUEST_AGENT",
+              clientId: parsedMessage.clientId,
+              time: Math.floor(Date.now() / 1000),
+            })
+          );
 
-          clients[parsedMessage.clientId].send(JSON.stringify({
-            type: 'AGENT_ASSIGNED'
-          }));
+          clients[parsedMessage.clientId].send(
+            JSON.stringify({
+              type: "AGENT_ASSIGNED",
+              time: Math.floor(Date.now() / 1000),
+            })
+          );
         } else {
-          const connectedAgent = findConnectedAgent()
+          const connectedAgent = findConnectedAgent();
           if (connectedAgent) {
-            connectedAgent.send(JSON.stringify({
-              type: 'CLIENT_REQUEST_AGENT',
-              clientId: parsedMessage.clientId
-            })); 
+            connectedAgent.send(
+              JSON.stringify({
+                type: "CLIENT_REQUEST_AGENT",
+                clientId: parsedMessage.clientId,
+                time: Math.floor(Date.now() / 1000),
+              })
+            );
           } else {
-            clients[parsedMessage.clientId].send(JSON.stringify({
-              type: 'SYSTEM_MESSAGE_NO_AGENTS',
-              content: 'No agents available at the moment. Please try again later.'
-            }));
+            clients[parsedMessage.clientId].send(
+              JSON.stringify({
+                type: "SYSTEM_MESSAGE_NO_AGENTS",
+                content:
+                  "No agents available at the moment. Please try again later.",
+                time: Math.floor(Date.now() / 1000),
+              })
+            );
           }
         }
         break;
 
-      case 'SWITCH_TO_BOT':
+      case "SWITCH_TO_BOT":
         if (agents[parsedMessage.clientId]) {
           // End agent session
-          agents[parsedMessage.clientId].send(JSON.stringify({
-            type: 'SESSION_ENDED',
-            clientId: parsedMessage.clientId
-          }));
+          agents[parsedMessage.clientId].send(
+            JSON.stringify({
+              type: "SESSION_ENDED",
+              clientId: parsedMessage.clientId,
+              time: Math.floor(Date.now() / 1000),
+            })
+          );
         }
 
         // Notify client that it's back to bot mode
-        clients[parsedMessage.clientId].send(JSON.stringify({
-          type: 'SESSION_ENDED'
-        }));
+        clients[parsedMessage.clientId].send(
+          JSON.stringify({
+            type: "SESSION_ENDED",
+            time: Math.floor(Date.now() / 1000),
+          })
+        );
         console.log(`Client ${parsedMessage.clientId} switched back to bot`);
         break;
 
       default:
-        console.log('Unknown message type:', parsedMessage.type);
+        console.log("Unknown message type:", parsedMessage.type);
     }
   });
 
-  ws.on('close', () => {
+  ws.on("close", () => {
     // Cleanup client and agent connections
     for (const clientId in clients) {
       if (clients[clientId] === ws) {
@@ -172,28 +210,35 @@ async function sendMessage(ws, message, clientId) {
     // handleIncomingMessage({ text: message, sender: 'client' });
 
     try {
-      const response = await fetch('http://localhost:5005/webhooks/rest/webhook', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sender: 'user',
-          message: message
-        })
-      });
-  
+      const response = await fetch(
+        "http://localhost:5005/webhooks/rest/webhook",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sender: "user",
+            message: message,
+          }),
+        }
+      );
+
       const data = await response.json();
-  
-      const result = data[0].text ?? undefined
+
+      const result = data[0].text ?? undefined;
       if (result) {
-        responseFromBot(ws, result, clientId)
+        responseFromBot(ws, result, clientId);
       }
     } catch (e) {
-      console.error(e)
-      ws.send(JSON.stringify({
-        type: 'BOT_MESSAGE',
-        clientId,
-        content: "There was an error processing your request. Please try again later."
-      }));
+      console.error(e);
+      ws.send(
+        JSON.stringify({
+          type: "BOT_MESSAGE",
+          clientId,
+          content:
+            "There was an error processing your request. Please try again later.",
+          time: Math.floor(Date.now() / 1000),
+        })
+      );
     }
 
     // data.forEach(msg => handleIncomingMessage({ text: msg.text, sender: 'bot' }));
@@ -208,12 +253,15 @@ async function sendMessage(ws, message, clientId) {
 
 function responseFromBot(ws, message, clientId) {
   if (message) {
-    ws.send(JSON.stringify({
-      type: 'BOT_MESSAGE',
-      clientId: clientId,
-      content: message,
-    }));
+    ws.send(
+      JSON.stringify({
+        type: "BOT_MESSAGE",
+        clientId: clientId,
+        content: message,
+        time: Math.floor(Date.now() / 1000),
+      })
+    );
   }
 }
 
-console.log('WebSocket server running on ws://localhost:7070');
+console.log("WebSocket server running on ws://localhost:7070");
